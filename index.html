@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soru Çarkı</title>
+  <link rel="icon" href="./turkey.ico?v=2" type="image/x-icon">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #ffd166, #ef476f 48%, #8338ec);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #222;
+      overflow: hidden;
+    }
+    .container {
+      background: rgba(255,255,255,0.92);
+      padding: 10px;
+      border-radius: 24px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+      max-width: 930px;
+      width: 94%;
+      max-height: 96vh;
+      overflow: hidden;
+    }
+    .small { font-size: 13px; opacity: 0.75; margin: 0 0 4px; }
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    .student-card {
+      background: #374151;
+      color: white;
+      padding: 8px 6px;
+      border-radius: 13px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 2px #111827;
+      min-height: 42px;
+    }
+    .student-card.selected {
+      background: #dc2626;
+      color: white;
+      box-shadow: inset 0 0 0 4px #450a0a, 0 0 0 2px white;
+      transform: scale(0.96);
+    }
+    
+    #turnBox { font-size: 22px; font-weight: 900; margin-bottom: 8px; color: #222; }
+    .stage {
+      position: relative;
+      width: min(72vw, 500px);
+      height: min(72vw, 500px);
+      margin: 6px auto 10px;
+      display: grid;
+      place-items: center;
+    }
+    .pointer {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 22px solid transparent;
+      border-right: 22px solid transparent;
+      border-top: 48px solid #222;
+      z-index: 8;
+      filter: drop-shadow(0 4px 3px rgba(0,0,0,0.25));
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      transition: transform 4.8s cubic-bezier(.12,.82,.18,1);
+      box-shadow: inset 0 0 0 12px rgba(30,41,59,0.9), 0 14px 35px rgba(0,0,0,0.28);
+      background: white;
+    }
+    .question-zoom {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 86%;
+      min-height: 120px;
+      transform: translate(-50%, -50%) scale(0.2);
+      opacity: 0;
+      z-index: 9;
+      pointer-events: none;
+      padding: 28px 34px;
+      border-radius: 28px;
+      background: #22c55e;
+      border: 8px solid white;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.38);
+      font-size: clamp(26px, 4.2vw, 44px);
+      font-weight: 900;
+      line-height: 1.18;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #102012;
+    }
+    .question-zoom.show { animation: zoomQuestion 1s cubic-bezier(.15,.95,.2,1.15) forwards; }
+    @keyframes zoomQuestion {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.15) rotate(-6deg); }
+      60% { opacity: 1; transform: translate(-50%, -50%) scale(1.16) rotate(1deg); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    }
+    .wheel-dim { filter: brightness(0.72) blur(1px); }
+    button {
+      border: none;
+      background: #222;
+      color: white;
+      padding: 14px 30px;
+      border-radius: 999px;
+      font-size: 19px;
+      cursor: pointer;
+      margin: 6px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+    button:hover { background: #444; transform: translateY(-1px); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .done-btn { background: #15803d; visibility: hidden; opacity: 0; transition: opacity 0.2s ease; }
+    .done-btn:hover { background: #166534; }
+    .done-btn.visible { visibility: visible; opacity: 1; }
+    #questions { display: none; }
+  </style>
+</head>
+<body>
+  <div id="nameScreen" class="container">
+    <h1 style="font-size:26px;margin:4px 0;">Kimler oynuyor?</h1>
+    <p class="small">Adınızı seçin.</p>
+    <div id="studentChoices" class="student-grid">
+      <button type="button" class="student-card" data-name="Hadil" onclick="toggleStudent(this)">Hadil</button>
+      <button type="button" class="student-card" data-name="Klara" onclick="toggleStudent(this)">Klara</button>
+      <button type="button" class="student-card" data-name="Dilek" onclick="toggleStudent(this)">Dilek</button>
+      <button type="button" class="student-card" data-name="Frederik" onclick="toggleStudent(this)">Frederik</button>
+      <button type="button" class="student-card" data-name="Nick" onclick="toggleStudent(this)">Nick</button>
+      <button type="button" class="student-card" data-name="Alex" onclick="toggleStudent(this)">Alex</button>
+      <button type="button" class="student-card" data-name="Nirosh" onclick="toggleStudent(this)">Nirosh</button>
+      <button type="button" class="student-card" data-name="Maike" onclick="toggleStudent(this)">Maike</button>
+      <button type="button" class="student-card" data-name="Marie" onclick="toggleStudent(this)">Marie</button>
+      <button type="button" class="student-card" data-name="Parmida" onclick="toggleStudent(this)">Parmida</button>
+      <button type="button" class="student-card" data-name="Eva" onclick="toggleStudent(this)">Eva</button>
+      <button type="button" class="student-card" data-name="Shahed" onclick="toggleStudent(this)">Shahed</button>
+      <button type="button" class="student-card" data-name="Mehdi" onclick="toggleStudent(this)">Mehdi</button>
+      <button type="button" class="student-card" data-name="Lena" onclick="toggleStudent(this)">Lena</button>
+      <button type="button" class="student-card" data-name="Andres" onclick="toggleStudent(this)">Andres</button>
+      <button type="button" class="student-card" data-name="Mareile" onclick="toggleStudent(this)">Mareile</button>
+      <button type="button" class="student-card" data-name="Levin" onclick="toggleStudent(this)">Levin</button>
+      <button type="button" class="student-card" data-name="Julia" onclick="toggleStudent(this)">Julia</button>
+      <button type="button" class="student-card" data-name="Jonathan" onclick="toggleStudent(this)">Jonathan</button>
+      <button type="button" class="student-card" data-name="Meyra" onclick="toggleStudent(this)">Meyra</button>
+    </div>
+    <button type="button" onclick="startGame()">Tamam</button>
+  </div>
+
+  <div id="gameScreen" class="container" style="display:none;">
+    <div id="turnBox"></div>
+    <div id="stage" class="stage">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="1000" height="1000"></canvas>
+      <div id="questionZoom" class="question-zoom"></div>
+    </div>
+    <div style="position:relative;width:100%;margin-top:6px;height:64px;">
+      <button type="button" id="soundBtn" onclick="toggleSound()" style="position:absolute;left:18px;bottom:0;width:52px;height:52px;padding:0;border-radius:50%;font-size:22px;background:#1e293b;box-shadow:0 6px 14px rgba(0,0,0,0.22);">🔊</button>
+      <div style="display:flex;justify-content:center;">
+        <button type="button" id="spinBtn" onclick="spinWheel()">Çevir</button>
+      </div>
+    </div>
+    <button type="button" id="doneBtn" class="done-btn" onclick="removeSelectedQuestion()">Cevap verdim.</button>
+    <textarea id="questions">Ne zaman ve nerede doğdun?
+Bu sabah saat kaçta kalktın?
+Bugün kahvaltıda neler yedin, içtin?
+Bu sabah evden çıkmadan önce neler yaptın?
+İlk öğretmeninin adı neydi? Nasıl bir öğretmendi?
+Bugün derse neyle geldin?
+En son ne zaman sinemaya gittin? Hangi filmi izledin?
+İlk bisikletini ne zaman aldın? Nasıl bir bisikletti?
+Hafta sonu neler yaptın?
+İlk kez ne zaman uçağa bindin ve nereye gittin?
+En son hangi kitabı okudun? Kitabın türü neydi?
+En son kime mesaj yazdın?
+Hangi ülkeleri gördün? En son hangi ülkeye gittin? Niçin?
+Dün akşam saat kaçta yattın?
+Ayakkabılarını nereden aldın? Ne zaman?
+Şimdiki evine ne zaman taşındın? Nereden?
+En son ne zaman bir arkadaşın için hediye aldın? Bu hediye neydi?
+İlk cep telefonun hangi modeldi? Kim aldı?
+Dün hava nasıldı?</textarea>
+  </div>
+
+  <script>
+    const WHEEL_COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#8b5cf6", "#d946ef", "#ec4899", "#14b8a6"];
+    let questions = [];
+    let rotation = 0;
+    let spinning = false;
+    let selectedIndex = null;
+    let audioCtx = null;
+    let clickTimer = null;
+    let soundEnabled = true;
+    let students = [];
+    let currentStudentIndex = 0;
+
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const doneBtn = document.getElementById("doneBtn");
+    const questionZoom = document.getElementById("questionZoom");
+    const soundBtn = document.getElementById("soundBtn");
+    const nameScreen = document.getElementById("nameScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const turnBox = document.getElementById("turnBox");
+
+    function toggleStudent(button) {
+      button.classList.toggle("selected");
+    }
+
+    function startGame() {
+      students = Array.from(document.querySelectorAll("#studentChoices .student-card.selected"))
+        .map(button => button.dataset.name);
+      if (students.length === 0) {
+        alert("En az bir öğrenci seç.");
+        return;
+      }
+      questions = document.getElementById("questions").value.split("\n").map(q => q.trim()).filter(q => q.length > 0);
+      currentStudentIndex = 0;
+      selectedIndex = null;
+      spinning = false;
+      rotation = 0;
+      canvas.style.transform = "rotate(0deg)";
+      hideZoom();
+      doneBtn.classList.remove("visible");
+      spinBtn.disabled = false;
+      nameScreen.style.display = "none";
+      gameScreen.style.display = "block";
+      updateTurnBox();
+      drawWheel();
+    }
+
+    function updateTurnBox() {
+      turnBox.textContent = `Sıra: ${students[currentStudentIndex]}`;
+    }
+
+    function nextStudent() {
+      currentStudentIndex = (currentStudentIndex + 1) % students.length;
+      updateTurnBox();
+    }
+
+    function syncTextarea() {
+      document.getElementById("questions").value = questions.join("\n");
+    }
+
+    function fitText(text, maxChars) {
+      return text.length <= maxChars ? text : text.slice(0, maxChars - 1) + "…";
+    }
+
+    function drawHypnosisCenter() {
+      const turns = 4.8;
+      const maxR = 78;
+      ctx.save();
+      ctx.lineWidth = 10;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#111";
+      ctx.beginPath();
+      for (let t = 0; t < Math.PI * 2 * turns; t += 0.045) {
+        const r = (t / (Math.PI * 2 * turns)) * maxR;
+        const x = Math.cos(t) * r;
+        const y = Math.sin(t) * r;
+        if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      for (let t = 0; t < Math.PI * 2 * turns; t += 0.045) {
+        const r = (t / (Math.PI * 2 * turns)) * maxR;
+        const x = Math.cos(t + 0.55) * r;
+        const y = Math.sin(t + 0.55) * r;
+        if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, maxR + 8, 0, Math.PI * 2);
+      ctx.strokeStyle = "#111";
+      ctx.lineWidth = 7;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawWheel() {
+      const size = canvas.width;
+      const center = size / 2;
+      const radius = center - 18;
+      const count = questions.length;
+      ctx.clearRect(0, 0, size, size);
+      if (count === 0) {
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.beginPath();
+        ctx.arc(0, 0, 180, 0, Math.PI * 2);
+        ctx.fillStyle = "#22c55e";
+        ctx.fill();
+        ctx.strokeStyle = "#1e293b";
+        ctx.lineWidth = 12;
+        ctx.stroke();
+        ctx.fillStyle = "white";
+        ctx.font = "bold 72px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Bitti!", 0, 0);
+        ctx.restore();
+        return;
+      }
+      ctx.save();
+      ctx.translate(center, center);
+      for (let i = 0; i < count; i++) {
+        const start = (i / count) * Math.PI * 2;
+        const end = ((i + 1) / count) * Math.PI * 2;
+        const mid = start + (end - start) / 2;
+        const isSelected = i === selectedIndex;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = isSelected ? "#16a34a" : WHEEL_COLORS[i % WHEEL_COLORS.length];
+        ctx.fill();
+        ctx.strokeStyle = "#1e293b";
+        ctx.lineWidth = isSelected ? 10 : 4;
+        ctx.stroke();
+        ctx.save();
+        ctx.rotate(mid);
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#111827";
+        ctx.font = count > 14 ? "bold 17px Arial" : "bold 20px Arial";
+        const label = fitText(questions[i], count > 14 ? 34 : 44);
+        const words = label.split(" ");
+        const lines = [];
+        let line = "";
+        const lineLimit = count > 14 ? 17 : 21;
+        words.forEach(word => {
+          if ((line + " " + word).trim().length > lineLimit) {
+            lines.push(line.trim());
+            line = word;
+          } else {
+            line += " " + word;
+          }
+        });
+        if (line.trim()) lines.push(line.trim());
+        const textX = radius * 0.58;
+        const lineHeight = count > 14 ? 21 : 25;
+        const startY = -((lines.length - 1) * lineHeight) / 2;
+        lines.slice(0, 3).forEach((l, index) => ctx.fillText(l, textX, startY + index * lineHeight));
+        ctx.restore();
+      }
+      drawHypnosisCenter();
+      ctx.restore();
+    }
+
+    function hideZoom() {
+      questionZoom.classList.remove("show");
+      questionZoom.innerHTML = "";
+      canvas.classList.remove("wheel-dim");
+    }
+
+    function getQuestionEmoji(text) {
+      const t = text.toLowerCase();
+      if (t.includes("doğdun")) return "👶";
+      if (t.includes("kalktın")) return "⏰";
+      if (t.includes("kahvaltı")) return "🍳";
+      if (t.includes("evden")) return "🏠";
+      if (t.includes("öğretmen")) return "👩‍🏫";
+      if (t.includes("derse") || t.includes("geldin")) return "🚌";
+      if (t.includes("sinema") || t.includes("film")) return "🎬";
+      if (t.includes("bisiklet")) return "🚲";
+      if (t.includes("hafta sonu")) return "🎉";
+      if (t.includes("uçağa") || t.includes("uçak")) return "✈️";
+      if (t.includes("kitap") || t.includes("okudun")) return "📚";
+      if (t.includes("mesaj")) return "💬";
+      if (t.includes("ülke") || t.includes("gittin")) return "🌍";
+      if (t.includes("yattın")) return "🌙";
+      if (t.includes("ayakkabı")) return "👟";
+      if (t.includes("taşındın")) return "📦";
+      if (t.includes("hediye")) return "🎁";
+      if (t.includes("telefon")) return "📱";
+      if (t.includes("hava")) return "⛅";
+      return "❓";
+    }
+
+    function showQuestionZoom(text) {
+      questionZoom.classList.remove("show");
+      const emoji = getQuestionEmoji(text);
+      const color = WHEEL_COLORS[selectedIndex % WHEEL_COLORS.length];
+      questionZoom.style.background = color;
+      const darkColors = ["#3b82f6", "#8b5cf6", "#d946ef", "#ef4444"];
+      questionZoom.style.color = darkColors.includes(color) ? "white" : "#111";
+      questionZoom.innerHTML = `<div style="font-size:72px;margin-bottom:14px;">${emoji}</div><div>${text}</div>`;
+      canvas.classList.add("wheel-dim");
+      void questionZoom.offsetWidth;
+      questionZoom.classList.add("show");
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
+    }
+
+    function initAudio() {
+      if (!soundEnabled) return;
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function tickSound(volume = 0.08, frequency = 780) {
+      if (!audioCtx || !soundEnabled) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "square";
+      osc.frequency.value = frequency;
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.025);
+    }
+
+    function startSpinSound() {
+      initAudio();
+      let interval = 45;
+      let elapsed = 0;
+      clearTimeout(clickTimer);
+      function loop() {
+        tickSound(0.055, 650 + Math.random() * 260);
+        elapsed += interval;
+        interval = Math.min(230, interval + 6);
+        if (elapsed < 4800) clickTimer = setTimeout(loop, interval);
+      }
+      loop();
+    }
+
+    function successSound() {
+      if (!audioCtx || !soundEnabled) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(240, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(180, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.28, audioCtx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.24);
+    }
+
+    function stopSpinSound() {
+      clearTimeout(clickTimer);
+      clickTimer = null;
+      tickSound(0.13, 420);
+      setTimeout(() => tickSound(0.11, 320), 90);
+    }
+
+    function spinWheel() {
+      if (spinning || questions.length === 0) return;
+      spinning = true;
+      selectedIndex = null;
+      spinBtn.disabled = true;
+      doneBtn.classList.remove("visible");
+      hideZoom();
+      drawWheel();
+      startSpinSound();
+      const count = questions.length;
+      const selected = Math.floor(Math.random() * count);
+      const slice = 360 / count;
+      const selectedMiddle = selected * slice + slice / 2;
+      const targetAngle = 270 - selectedMiddle;
+      const currentNormalized = ((rotation % 360) + 360) % 360;
+      const distance = ((targetAngle - currentNormalized) + 360) % 360;
+      rotation += 360 * 7 + distance;
+      canvas.style.transform = `rotate(${rotation}deg)`;
+      setTimeout(() => {
+        stopSpinSound();
+        selectedIndex = selected;
+        drawWheel();
+        showQuestionZoom(questions[selected]);
+        spinning = false;
+        spinBtn.disabled = true;
+        doneBtn.classList.add("visible");
+      }, 5000);
+    }
+
+    function removeSelectedQuestion() {
+      if (selectedIndex === null || !questions[selectedIndex]) return;
+
+      successSound();
+      questions.splice(selectedIndex, 1);
+      nextStudent();
+      selectedIndex = null;
+      hideZoom();
+      syncTextarea();
+      drawWheel();
+      doneBtn.classList.remove("visible");
+      spinBtn.disabled = false;
+      gameScreen.style.display = "block";
+      nameScreen.style.display = "none";
+    }
+  </script>
+</body>
+</html>
