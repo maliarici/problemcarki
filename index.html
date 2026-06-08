@@ -168,24 +168,24 @@
     </div>
     <button type="button" id="doneBtn" class="done-btn" onclick="removeSelectedQuestion()">Cevap verdim.</button>
     <textarea id="questions">Ne zaman ve nerede doğdun?
-Bu sabah saat kaçta kalktın?
-Bugün kahvaltıda neler yedin, içtin?
-Bu sabah evden çıkmadan önce neler yaptın?
-İlk öğretmeninin adı neydi? Nasıl bir öğretmendi?
-Bugün derse neyle geldin?
-En son ne zaman sinemaya gittin? Hangi filmi izledin?
-İlk bisikletini ne zaman aldın? Nasıl bir bisikletti?
-Hafta sonu neler yaptın?
-İlk kez ne zaman uçağa bindin ve nereye gittin?
-En son hangi kitabı okudun? Kitabın türü neydi?
-En son kime mesaj yazdın?
-Hangi ülkeleri gördün? En son hangi ülkeye gittin? Niçin?
-Dün akşam saat kaçta yattın?
-Ayakkabılarını nereden aldın? Ne zaman?
-Şimdiki evine ne zaman taşındın? Nereden?
-En son ne zaman bir arkadaşın için hediye aldın? Bu hediye neydi?
-İlk cep telefonun hangi modeldi? Kim aldı?
-Dün hava nasıldı?</textarea>
+Bir kafede kahve sipariş ettin ama gelen kahve seninki değil. Ne yaparsın? 
+Arkadaşınla buluşacaksın ama telefonunun şarjı bitti ve adresi bilmiyorsun. Ne yaparsın? 
+Markette ödeme yapacaksın ama kartın çalışmıyor. Başka paran da yok. Arkanda uzun bir sıra var. Ne yaparsın? Ne dersin?
+Yeni bir şehirde kayboldun. İnternetin yok ve kimse senin dilini iyi konuşmuyor. Ne yaparsın? 
+Arkadaşının doğum gününe gidiyorsun ama hediyeyi evde unuttun. Ne yaparsın? 
+Bir arkadaşın sana yemek yaptı ama yemeği hiç beğenmedin. Ne söylersin, ne yaparsın? 
+Yemek sipariş ettin ama bir saat oldu, gelmedi. Çok açsın ve restoranı aradın. Ne dersin? (Diyalog)
+Saat 23.30. Komşun çok yüksek sesle müzik dinliyor ve senin sabah erken dersin/işin var. Ne yaparsın?
+Kuaföre gittin, saçını çok kısa kesti ve hiç beğenmedin. Kuaför "Nasıl oldu?" diye sordu. Ne dersin?
+Bir arkadaşından okumak için kitap aldın ama yanlışlıkla üzerine kahve döktün. Ne yaparsın?
+İnternetten ikinci el bir eşya aldın ama bozuk çıktı. Satıcı mesajlarına cevap vermiyor. Ne yaparsın?
+Yanlışlıkla öğretmenine (veya patronuna) ondan şikâyet ettiğin bir mesaj gönderdin. Ne yaparsın?
+Uzun bir otobüs yolculuğundasın. Yanındaki kişi kulaklıksız, yüksek sesle video izliyor. Ne yaparsın?
+Bir arkadaşın senden sürekli ufak tefek borç para istiyor ama hiç geri ödemiyor. Yine para istedi. Ne dersin?
+Kaldığın otelde duştan sadece buz gibi su akıyor. Resepsiyonu aradın. Ne dersin? (Diyalog)
+Yolda içinde biraz para ve kimlik kartları olan bir cüzdan buldun. Etrafta kimse yok. Ne yaparsın?
+Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“stalklarken”), yanlışlıkla 2 yıl önceki bir fotoğrafını beğendin. Ne yaparsın?
+</textarea>
   </div>
 
   <script>
@@ -360,30 +360,6 @@ Dün hava nasıldı?</textarea>
       questionZoom.classList.remove("show");
       questionZoom.innerHTML = "";
       canvas.classList.remove("wheel-dim");
-    }
-
-    function getQuestionEmoji(text) {
-      const t = text.toLowerCase();
-      if (t.includes("doğdun")) return "👶";
-      if (t.includes("kalktın")) return "⏰";
-      if (t.includes("kahvaltı")) return "🍳";
-      if (t.includes("evden")) return "🏠";
-      if (t.includes("öğretmen")) return "👩‍🏫";
-      if (t.includes("derse") || t.includes("geldin")) return "🚌";
-      if (t.includes("sinema") || t.includes("film")) return "🎬";
-      if (t.includes("bisiklet")) return "🚲";
-      if (t.includes("hafta sonu")) return "🎉";
-      if (t.includes("uçağa") || t.includes("uçak")) return "✈️";
-      if (t.includes("kitap") || t.includes("okudun")) return "📚";
-      if (t.includes("mesaj")) return "💬";
-      if (t.includes("ülke") || t.includes("gittin")) return "🌍";
-      if (t.includes("yattın")) return "🌙";
-      if (t.includes("ayakkabı")) return "👟";
-      if (t.includes("taşındın")) return "📦";
-      if (t.includes("hediye")) return "🎁";
-      if (t.includes("telefon")) return "📱";
-      if (t.includes("hava")) return "⛅";
-      return "❓";
     }
 
     function showQuestionZoom(text) {
