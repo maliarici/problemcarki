@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Problem Çarkı</title>
   <link rel="icon" href="./turkey.ico?v=2" type="image/x-icon">
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -19,6 +21,7 @@
       color: #222;
       overflow: hidden;
     }
+
     .container {
       background: rgba(255,255,255,0.92);
       padding: 10px;
@@ -29,7 +32,13 @@
       max-height: 96vh;
       overflow: hidden;
     }
-    .small { font-size: 13px; opacity: 0.75; margin: 0 0 4px; }
+
+    .small {
+      font-size: 13px;
+      opacity: 0.75;
+      margin: 0 0 4px;
+    }
+
     .student-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -37,6 +46,7 @@
       margin: 10px 0;
       overflow: hidden;
     }
+
     .student-card {
       background: #374151;
       color: white;
@@ -48,14 +58,21 @@
       box-shadow: inset 0 0 0 2px #111827;
       min-height: 42px;
     }
+
     .student-card.selected {
       background: #dc2626;
       color: white;
       box-shadow: inset 0 0 0 4px #450a0a, 0 0 0 2px white;
       transform: scale(0.96);
     }
-    
-    #turnBox { font-size: 22px; font-weight: 900; margin-bottom: 8px; color: #222; }
+
+    #turnBox {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #222;
+    }
+
     .stage {
       position: relative;
       width: min(72vw, 500px);
@@ -64,6 +81,7 @@
       display: grid;
       place-items: center;
     }
+
     .pointer {
       position: absolute;
       top: -2px;
@@ -77,6 +95,7 @@
       z-index: 8;
       filter: drop-shadow(0 4px 3px rgba(0,0,0,0.25));
     }
+
     canvas {
       width: 100%;
       height: 100%;
@@ -85,6 +104,7 @@
       box-shadow: inset 0 0 0 12px rgba(30,41,59,0.9), 0 14px 35px rgba(0,0,0,0.28);
       background: white;
     }
+
     .question-zoom {
       position: absolute;
       left: 50%;
@@ -109,13 +129,32 @@
       justify-content: center;
       color: #102012;
     }
-    .question-zoom.show { animation: zoomQuestion 1s cubic-bezier(.15,.95,.2,1.15) forwards; }
-    @keyframes zoomQuestion {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.15) rotate(-6deg); }
-      60% { opacity: 1; transform: translate(-50%, -50%) scale(1.16) rotate(1deg); }
-      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+
+    .question-zoom.show {
+      animation: zoomQuestion 1s cubic-bezier(.15,.95,.2,1.15) forwards;
     }
-    .wheel-dim { filter: brightness(0.72) blur(1px); }
+
+    @keyframes zoomQuestion {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.15) rotate(-6deg);
+      }
+
+      60% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.16) rotate(1deg);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+    }
+
+    .wheel-dim {
+      filter: brightness(0.72) blur(1px);
+    }
+
     button {
       border: none;
       background: #222;
@@ -127,18 +166,45 @@
       margin: 6px;
       box-shadow: 0 8px 15px rgba(0,0,0,0.2);
     }
-    button:hover { background: #444; transform: translateY(-1px); }
-    button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-    .done-btn { background: #15803d; visibility: hidden; opacity: 0; transition: opacity 0.2s ease; }
-    .done-btn:hover { background: #166534; }
-    .done-btn.visible { visibility: visible; opacity: 1; }
-    #questions { display: none; }
+
+    button:hover {
+      background: #444;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .done-btn {
+      background: #15803d;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .done-btn:hover {
+      background: #166534;
+    }
+
+    .done-btn.visible {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    #questions {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
   <div id="nameScreen" class="container">
     <h1 style="font-size:26px;margin:4px 0;">Kimler oynuyor?</h1>
     <p class="small">Adınızı seçin.</p>
+
     <div id="studentChoices" class="student-grid">
       <button type="button" class="student-card" data-name="Bálint" onclick="toggleStudent(this)">Bálint</button>
       <button type="button" class="student-card" data-name="Steven" onclick="toggleStudent(this)">Steven</button>
@@ -150,30 +216,41 @@
       <button type="button" class="student-card" data-name="Jordan" onclick="toggleStudent(this)">Jordan</button>
       <button type="button" class="student-card" data-name="Küçük Lisa" onclick="toggleStudent(this)">Küçük Lisa</button>
     </div>
+
     <button type="button" onclick="startGame()">Tamam</button>
   </div>
 
   <div id="gameScreen" class="container" style="display:none;">
     <div id="turnBox"></div>
+
     <div id="stage" class="stage">
       <div class="pointer"></div>
       <canvas id="wheel" width="1000" height="1000"></canvas>
       <div id="questionZoom" class="question-zoom"></div>
     </div>
+
     <div style="position:relative;width:100%;margin-top:6px;height:64px;">
-      <button type="button" id="soundBtn" onclick="toggleSound()" style="position:absolute;left:18px;bottom:0;width:52px;height:52px;padding:0;border-radius:50%;font-size:22px;background:#1e293b;box-shadow:0 6px 14px rgba(0,0,0,0.22);">🔊</button>
+      <button
+        type="button"
+        id="soundBtn"
+        onclick="toggleSound()"
+        style="position:absolute;left:18px;bottom:0;width:52px;height:52px;padding:0;border-radius:50%;font-size:22px;background:#1e293b;box-shadow:0 6px 14px rgba(0,0,0,0.22);"
+      >🔊</button>
+
       <div style="display:flex;justify-content:center;">
         <button type="button" id="spinBtn" onclick="spinWheel()">Çevir</button>
       </div>
     </div>
+
     <button type="button" id="doneBtn" class="done-btn" onclick="removeSelectedQuestion()">Cevap verdim.</button>
+
     <textarea id="questions">Ne zaman ve nerede doğdun?
-Bir kafede kahve sipariş ettin ama gelen kahve seninki değil. Ne yaparsın? 
-Arkadaşınla buluşacaksın ama telefonunun şarjı bitti ve adresi bilmiyorsun. Ne yaparsın? 
+Bir kafede kahve sipariş ettin ama gelen kahve seninki değil. Ne yaparsın?
+Arkadaşınla buluşacaksın ama telefonunun şarjı bitti ve adresi bilmiyorsun. Ne yaparsın?
 Markette ödeme yapacaksın ama kartın çalışmıyor. Başka paran da yok. Arkanda uzun bir sıra var. Ne yaparsın? Ne dersin?
-Yeni bir şehirde kayboldun. İnternetin yok ve kimse senin dilini iyi konuşmuyor. Ne yaparsın? 
-Arkadaşının doğum gününe gidiyorsun ama hediyeyi evde unuttun. Ne yaparsın? 
-Bir arkadaşın sana yemek yaptı ama yemeği hiç beğenmedin. Ne söylersin, ne yaparsın? 
+Yeni bir şehirde kayboldun. İnternetin yok ve kimse senin dilini iyi konuşmuyor. Ne yaparsın?
+Arkadaşının doğum gününe gidiyorsun ama hediyeyi evde unuttun. Ne yaparsın?
+Bir arkadaşın sana yemek yaptı ama yemeği hiç beğenmedin. Ne söylersin, ne yaparsın?
 Yemek sipariş ettin ama bir saat oldu, gelmedi. Çok açsın ve restoranı aradın. Ne dersin? (Diyalog)
 Saat 23.30. Komşun çok yüksek sesle müzik dinliyor ve senin sabah erken dersin/işin var. Ne yaparsın?
 Kuaföre gittin, saçını çok kısa kesti ve hiç beğenmedin. Kuaför "Nasıl oldu?" diye sordu. Ne dersin?
@@ -184,12 +261,23 @@ Uzun bir otobüs yolculuğundasın. Yanındaki kişi kulaklıksız, yüksek sesl
 Bir arkadaşın senden sürekli ufak tefek borç para istiyor ama hiç geri ödemiyor. Yine para istedi. Ne dersin?
 Kaldığın otelde duştan sadece buz gibi su akıyor. Resepsiyonu aradın. Ne dersin? (Diyalog)
 Yolda içinde biraz para ve kimlik kartları olan bir cüzdan buldun. Etrafta kimse yok. Ne yaparsın?
-Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“stalklarken”), yanlışlıkla 2 yıl önceki bir fotoğrafını beğendin. Ne yaparsın?
-</textarea>
+Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“stalklarken”), yanlışlıkla 2 yıl önceki bir fotoğrafını beğendin. Ne yaparsın?</textarea>
   </div>
 
   <script>
-    const WHEEL_COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#06b6d4", "#3b82f6", "#8b5cf6", "#d946ef", "#ec4899", "#14b8a6"];
+    const WHEEL_COLORS = [
+      "#ef4444",
+      "#f97316",
+      "#eab308",
+      "#22c55e",
+      "#06b6d4",
+      "#3b82f6",
+      "#8b5cf6",
+      "#d946ef",
+      "#ec4899",
+      "#14b8a6"
+    ];
+
     let questions = [];
     let rotation = 0;
     let spinning = false;
@@ -217,21 +305,31 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
     function startGame() {
       students = Array.from(document.querySelectorAll("#studentChoices .student-card.selected"))
         .map(button => button.dataset.name);
+
       if (students.length === 0) {
         alert("En az bir öğrenci seç.");
         return;
       }
-      questions = document.getElementById("questions").value.split("\n").map(q => q.trim()).filter(q => q.length > 0);
+
+      questions = document.getElementById("questions").value
+        .split("\n")
+        .map(q => q.trim())
+        .filter(q => q.length > 0);
+
       currentStudentIndex = 0;
       selectedIndex = null;
       spinning = false;
       rotation = 0;
+
       canvas.style.transform = "rotate(0deg)";
+
       hideZoom();
       doneBtn.classList.remove("visible");
-      spinBtn.disabled = false;
+      spinBtn.disabled = questions.length === 0;
+
       nameScreen.style.display = "none";
       gameScreen.style.display = "block";
+
       updateTurnBox();
       drawWheel();
     }
@@ -253,36 +351,75 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
       return text.length <= maxChars ? text : text.slice(0, maxChars - 1) + "…";
     }
 
+    function getQuestionEmoji(text) {
+      const lower = text.toLowerCase();
+
+      if (lower.includes("kahve")) return "☕";
+      if (lower.includes("yemek") || lower.includes("sipariş")) return "🍽️";
+      if (lower.includes("telefon") || lower.includes("mesaj")) return "📱";
+      if (lower.includes("kart") || lower.includes("para") || lower.includes("borç")) return "💳";
+      if (lower.includes("şehir") || lower.includes("kayboldun")) return "🗺️";
+      if (lower.includes("doğum günü") || lower.includes("hediye")) return "🎁";
+      if (lower.includes("müzik") || lower.includes("komşu")) return "🎵";
+      if (lower.includes("kuaför") || lower.includes("saç")) return "💇";
+      if (lower.includes("kitap")) return "📚";
+      if (lower.includes("otel") || lower.includes("duş")) return "🏨";
+      if (lower.includes("cüzdan") || lower.includes("kimlik")) return "👛";
+      if (lower.includes("sosyal medya") || lower.includes("fotoğraf")) return "📸";
+      if (lower.includes("otobüs")) return "🚌";
+      if (lower.includes("doğdun")) return "👶";
+
+      return "❓";
+    }
+
     function drawHypnosisCenter() {
       const turns = 4.8;
       const maxR = 78;
+
       ctx.save();
       ctx.lineWidth = 10;
       ctx.lineCap = "round";
       ctx.strokeStyle = "#111";
       ctx.beginPath();
+
       for (let t = 0; t < Math.PI * 2 * turns; t += 0.045) {
         const r = (t / (Math.PI * 2 * turns)) * maxR;
         const x = Math.cos(t) * r;
         const y = Math.sin(t) * r;
-        if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+
+        if (t === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
       }
+
       ctx.stroke();
+
       ctx.strokeStyle = "#facc15";
       ctx.lineWidth = 5;
       ctx.beginPath();
+
       for (let t = 0; t < Math.PI * 2 * turns; t += 0.045) {
         const r = (t / (Math.PI * 2 * turns)) * maxR;
         const x = Math.cos(t + 0.55) * r;
         const y = Math.sin(t + 0.55) * r;
-        if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+
+        if (t === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
       }
+
       ctx.stroke();
+
       ctx.beginPath();
       ctx.arc(0, 0, maxR + 8, 0, Math.PI * 2);
       ctx.strokeStyle = "#111";
       ctx.lineWidth = 7;
       ctx.stroke();
+
       ctx.restore();
     }
 
@@ -291,52 +428,68 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
       const center = size / 2;
       const radius = center - 18;
       const count = questions.length;
+
       ctx.clearRect(0, 0, size, size);
+
       if (count === 0) {
         ctx.save();
         ctx.translate(center, center);
+
         ctx.beginPath();
         ctx.arc(0, 0, 180, 0, Math.PI * 2);
         ctx.fillStyle = "#22c55e";
         ctx.fill();
+
         ctx.strokeStyle = "#1e293b";
         ctx.lineWidth = 12;
         ctx.stroke();
+
         ctx.fillStyle = "white";
         ctx.font = "bold 72px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("Bitti!", 0, 0);
+
         ctx.restore();
         return;
       }
+
       ctx.save();
       ctx.translate(center, center);
+
       for (let i = 0; i < count; i++) {
         const start = (i / count) * Math.PI * 2;
         const end = ((i + 1) / count) * Math.PI * 2;
         const mid = start + (end - start) / 2;
         const isSelected = i === selectedIndex;
+
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, radius, start, end);
         ctx.closePath();
+
         ctx.fillStyle = isSelected ? "#16a34a" : WHEEL_COLORS[i % WHEEL_COLORS.length];
         ctx.fill();
+
         ctx.strokeStyle = "#1e293b";
         ctx.lineWidth = isSelected ? 10 : 4;
         ctx.stroke();
+
         ctx.save();
         ctx.rotate(mid);
+
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#111827";
         ctx.font = count > 14 ? "bold 17px Arial" : "bold 20px Arial";
+
         const label = fitText(questions[i], count > 14 ? 34 : 44);
         const words = label.split(" ");
         const lines = [];
         let line = "";
+
         const lineLimit = count > 14 ? 17 : 21;
+
         words.forEach(word => {
           if ((line + " " + word).trim().length > lineLimit) {
             lines.push(line.trim());
@@ -345,13 +498,22 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
             line += " " + word;
           }
         });
-        if (line.trim()) lines.push(line.trim());
+
+        if (line.trim()) {
+          lines.push(line.trim());
+        }
+
         const textX = radius * 0.58;
         const lineHeight = count > 14 ? 21 : 25;
         const startY = -((lines.length - 1) * lineHeight) / 2;
-        lines.slice(0, 3).forEach((l, index) => ctx.fillText(l, textX, startY + index * lineHeight));
+
+        lines.slice(0, 3).forEach((l, index) => {
+          ctx.fillText(l, textX, startY + index * lineHeight);
+        });
+
         ctx.restore();
       }
+
       drawHypnosisCenter();
       ctx.restore();
     }
@@ -364,14 +526,24 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
 
     function showQuestionZoom(text) {
       questionZoom.classList.remove("show");
+
       const emoji = getQuestionEmoji(text);
       const color = WHEEL_COLORS[selectedIndex % WHEEL_COLORS.length];
+
       questionZoom.style.background = color;
+
       const darkColors = ["#3b82f6", "#8b5cf6", "#d946ef", "#ef4444"];
       questionZoom.style.color = darkColors.includes(color) ? "white" : "#111";
-      questionZoom.innerHTML = `<div style="font-size:72px;margin-bottom:14px;">${emoji}</div><div>${text}</div>`;
+
+      questionZoom.innerHTML = `
+        <div style="font-size:72px;margin-bottom:14px;">${emoji}</div>
+        <div>${text}</div>
+      `;
+
       canvas.classList.add("wheel-dim");
+
       void questionZoom.offsetWidth;
+
       questionZoom.classList.add("show");
     }
 
@@ -382,49 +554,72 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
 
     function initAudio() {
       if (!soundEnabled) return;
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === "suspended") audioCtx.resume();
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
     }
 
     function tickSound(volume = 0.08, frequency = 780) {
       if (!audioCtx || !soundEnabled) return;
+
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
+
       osc.type = "square";
       osc.frequency.value = frequency;
       gain.gain.value = volume;
+
       osc.connect(gain);
       gain.connect(audioCtx.destination);
+
       osc.start();
       osc.stop(audioCtx.currentTime + 0.025);
     }
 
     function startSpinSound() {
       initAudio();
+
       let interval = 45;
       let elapsed = 0;
+
       clearTimeout(clickTimer);
+
       function loop() {
         tickSound(0.055, 650 + Math.random() * 260);
+
         elapsed += interval;
         interval = Math.min(230, interval + 6);
-        if (elapsed < 4800) clickTimer = setTimeout(loop, interval);
+
+        if (elapsed < 4800) {
+          clickTimer = setTimeout(loop, interval);
+        }
       }
+
       loop();
     }
 
     function successSound() {
       if (!audioCtx || !soundEnabled) return;
+
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
+
       osc.type = "triangle";
       osc.frequency.setValueAtTime(240, audioCtx.currentTime);
       osc.frequency.linearRampToValueAtTime(180, audioCtx.currentTime + 0.08);
+
       gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
       gain.gain.linearRampToValueAtTime(0.28, audioCtx.currentTime + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+
       osc.connect(gain);
       gain.connect(audioCtx.destination);
+
       osc.start();
       osc.stop(audioCtx.currentTime + 0.24);
     }
@@ -432,33 +627,49 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
     function stopSpinSound() {
       clearTimeout(clickTimer);
       clickTimer = null;
+
       tickSound(0.13, 420);
-      setTimeout(() => tickSound(0.11, 320), 90);
+
+      setTimeout(() => {
+        tickSound(0.11, 320);
+      }, 90);
     }
 
     function spinWheel() {
       if (spinning || questions.length === 0) return;
+
       spinning = true;
       selectedIndex = null;
+
       spinBtn.disabled = true;
       doneBtn.classList.remove("visible");
+
       hideZoom();
       drawWheel();
       startSpinSound();
+
       const count = questions.length;
       const selected = Math.floor(Math.random() * count);
+
       const slice = 360 / count;
       const selectedMiddle = selected * slice + slice / 2;
       const targetAngle = 270 - selectedMiddle;
+
       const currentNormalized = ((rotation % 360) + 360) % 360;
       const distance = ((targetAngle - currentNormalized) + 360) % 360;
+
       rotation += 360 * 7 + distance;
+
       canvas.style.transform = `rotate(${rotation}deg)`;
+
       setTimeout(() => {
         stopSpinSound();
+
         selectedIndex = selected;
+
         drawWheel();
         showQuestionZoom(questions[selected]);
+
         spinning = false;
         spinBtn.disabled = true;
         doneBtn.classList.add("visible");
@@ -469,14 +680,20 @@ Sosyal medyada çok samimi olmadığın birinin profiline gizlice bakarken (“s
       if (selectedIndex === null || !questions[selectedIndex]) return;
 
       successSound();
+
       questions.splice(selectedIndex, 1);
+
       nextStudent();
+
       selectedIndex = null;
+
       hideZoom();
       syncTextarea();
       drawWheel();
+
       doneBtn.classList.remove("visible");
-      spinBtn.disabled = false;
+      spinBtn.disabled = questions.length === 0;
+
       gameScreen.style.display = "block";
       nameScreen.style.display = "none";
     }
